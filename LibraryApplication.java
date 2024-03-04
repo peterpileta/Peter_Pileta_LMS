@@ -1,6 +1,6 @@
 import java.util.Scanner;
 /**
- * Peter Pileta, Software Development I, 01/28/2024
+ * Peter Pileta, Software Development I, 03/04/2024
  * Class Name: LibraryApplication
  * This class is the entry point for the Library Management System. It handles user interactions,
  * file input for adding books, and manages the operations of checking in/out and removing books.
