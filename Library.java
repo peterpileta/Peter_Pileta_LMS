@@ -11,10 +11,11 @@ import java.util.Scanner;
  * check out, and check in books. It acts as the database for the library system.
  */
 public class Library {
-    private Map<Integer, Book> books;
+    public Map<Integer, Book> books;
 
     public Library() {
         this.books = new HashMap<>();
+        books.put(1, new Book(1, "title1", "author1"));
     }
 
     // Add a book to the library
