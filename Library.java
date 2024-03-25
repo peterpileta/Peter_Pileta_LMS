@@ -15,7 +15,6 @@ public class Library {
 
     public Library() {
         this.books = new HashMap<>();
-        books.put(1, new Book(1, "title1", "author1"));
     }
 
     // Add a book to the library
