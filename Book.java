@@ -53,6 +53,6 @@ public class Book {
 
     @Override
     public String toString() {
-        return "ID: " + id + ", Title: " + title + ", Author: " + author + ", Checked Out: " + isCheckedOut + duedate != null? "Due date: " + duedate: "";
+        return "ID: " + id + ", Title: " + title + ", Author: " + author + ", Checked Out: " + isCheckedOut;
     }
 }
