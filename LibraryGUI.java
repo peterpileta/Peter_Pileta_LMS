@@ -20,7 +20,7 @@ public class LibraryGUI extends JFrame {
 
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/library";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "pezespada1";
+    private static final String PASSWORD = "password";
     Library library;
     JTextArea displayArea;
 
