@@ -9,6 +9,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 /**
  * Peter Pileta, Software Development I, 04/07/2024
  * Class Name: LibraryGUI
@@ -20,7 +25,7 @@ public class LibraryGUI extends JFrame {
 
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/library";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "password";
+    private static final String PASSWORD = "pezespada1";
     Library library;
     JTextArea displayArea;
 
@@ -80,6 +85,21 @@ public class LibraryGUI extends JFrame {
                     int rowsAffected = stmt.executeUpdate();
                     if (rowsAffected > 0) {
                         displayArea.append("Book with barcode " + barcodeField.getText() + " removed successfully.\n");
+                 	   Statement st;
+                 	   ResultSet rs;
+                 	   st = conn.createStatement();
+                 	   rs = st.executeQuery("select * from books");
+                 	    ResultSetMetaData metadata = rs.getMetaData();
+                 	    int columnCount = metadata.getColumnCount();  
+                 	    String content = "";
+                 	    while (rs.next()) {
+                 	        String row = "";
+                 	        for (int i = 1; i <= columnCount; i++) {
+                 	            row += rs.getString(i) + ", ";          
+                 	        }
+                 	        content += row + "\n";
+                 	    }
+                 	    displayArea.append(content);
                     } else {
                     	displayArea.append("No book found with barcode \"" + barcodeField.getText() + "\".");
                     }
@@ -100,6 +120,21 @@ public class LibraryGUI extends JFrame {
                     int rowsAffected = stmt.executeUpdate();
                     if (rowsAffected > 0) {
                     	displayArea.append("Book with title " + titleField.getText() + " removed successfully.\n");
+                 	   Statement st;
+                 	   ResultSet rs;
+                 	   st = conn.createStatement();
+                 	   rs = st.executeQuery("select * from books");
+                 	    ResultSetMetaData metadata = rs.getMetaData();
+                 	    int columnCount = metadata.getColumnCount();  
+                 	    String content = "";
+                 	    while (rs.next()) {
+                 	        String row = "";
+                 	        for (int i = 1; i <= columnCount; i++) {
+                 	            row += rs.getString(i) + ", ";          
+                 	        }
+                 	        content += row + "\n";
+                 	    }
+                 	    displayArea.append(content);
                     } else {
                     	displayArea.append("No book found with title \"" + titleField.getText() + "\".");
                     }
@@ -113,12 +148,29 @@ public class LibraryGUI extends JFrame {
         checkOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            	LocalDate localDate = LocalDate.now().plusWeeks(4);
                 try (Connection conn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
-                		 PreparedStatement stmt = conn.prepareStatement("UPDATE books SET checked_out = 1 WHERE title = ? AND checked_out = 0")) {
+                	   PreparedStatement stmt = conn.prepareStatement("UPDATE books SET checked_out = 1, due_date = " + dtf.format(localDate) + " WHERE title = ? AND checked_out = 0")) {
                        stmt.setString(1, checkOutField.getText());
                        int rowsUpdated = stmt.executeUpdate();
                        if (rowsUpdated > 0) {
                     	   displayArea.append("Book \"" + checkOutField.getText() + "\" checked out successfully.");
+                    	   Statement st;
+                    	   ResultSet rs;
+                    	   st = conn.createStatement();
+                    	   rs = st.executeQuery("select * from books");
+                    	    ResultSetMetaData metadata = rs.getMetaData();
+                    	    int columnCount = metadata.getColumnCount();  
+                    	    String content = "";
+                    	    while (rs.next()) {
+                    	        String row = "";
+                    	        for (int i = 1; i <= columnCount; i++) {
+                    	            row += rs.getString(i) + ", ";          
+                    	        }
+                    	        content += row + "\n";
+                    	    }
+                    	    displayArea.append(content);
                        } else {
                     	   displayArea.append("Book \"" + checkOutField.getText() + "\" not found or already checked out.");
                        }
@@ -133,11 +185,26 @@ public class LibraryGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
             	try (Connection conn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
-            			PreparedStatement stmt = conn.prepareStatement("UPDATE books SET checked_out = 0 WHERE title = ? AND checked_out = 1")) {
+            		   PreparedStatement stmt = conn.prepareStatement("UPDATE books SET checked_out = 0, due_date = NULL WHERE title = ? AND checked_out = 1")) {
                        stmt.setString(1, checkInField.getText());
                        int rowsUpdated = stmt.executeUpdate();
                        if (rowsUpdated > 0) {
                     	   displayArea.append("Book \"" + checkInField.getText() + "\" checked in successfully.");
+                    	   Statement st;
+                    	   ResultSet rs;
+                    	   st = conn.createStatement();
+                    	   rs = st.executeQuery("select * from books");
+                    	    ResultSetMetaData metadata = rs.getMetaData();
+                    	    int columnCount = metadata.getColumnCount();  
+                    	    String content = "";
+                    	    while (rs.next()) {
+                    	        String row = "";
+                    	        for (int i = 1; i <= columnCount; i++) {
+                    	            row += rs.getString(i) + ", ";          
+                    	        }
+                    	        content += row + "\n";
+                    	    }
+                    	    displayArea.append(content);
                        } else {
                     	   displayArea.append("Book \"" + checkInField.getText() + "\" not found or already checked in.");
                        }
