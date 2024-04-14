@@ -1,10 +1,9 @@
+import java.time.LocalDate;
 /**
- * Peter Pileta, Software Development I, 04/07/2024
  * Class Name: Book
- * This class represents a book with a unique ID, title, and author. 
+ * This class represents a book with a unique ID, title, and author.
  * It's used to create book objects to be managed within the library system.
  */
-import java.time.LocalDate;    
 public class Book {
     private int id;
     private String title;
@@ -42,6 +41,7 @@ public class Book {
         return duedate;
     }
 
+    /* Sets book status to checked out and updates due date to 1 week from current date */
     public void setCheckedOut(boolean checkedOut) {
         isCheckedOut = checkedOut;
         
@@ -50,9 +50,12 @@ public class Book {
         duedate = date.toString();
         } else duedate = null;
     }
-
+    /**
+     * Returns a String with book object properties and values
+     */
     @Override
     public String toString() {
         return "ID: " + id + ", Title: " + title + ", Author: " + author + ", Checked Out: " + isCheckedOut;
     }
 }
+
