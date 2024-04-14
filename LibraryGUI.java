@@ -5,33 +5,22 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 /**
- * Peter Pileta, Software Development I, 04/07/2024
  * Class Name: LibraryGUI
  * This class represents the GUI for the Library Management System (LMS) application.
- * It allows users to interact with the library database by performing various operations such as adding books, removing books,
+ * It allows users to interact with the system by performing various operations such as adding books, removing books,
  * checking books in/out, and displaying the library database.
  */
 public class LibraryGUI extends JFrame {
 
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/library";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "pezespada1";
     Library library;
     JTextArea displayArea;
 
     public LibraryGUI() {
         super("Library Management System");
 
+        // Initialize library
+        library = new Library();
 
         // Set layout
         setLayout(new BorderLayout());
@@ -70,42 +59,25 @@ public class LibraryGUI extends JFrame {
         bottomPanel.add(exitButton);
 
         // Add components to frame
+        add(topPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
+        // Load books button action listener
+        loadButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fileName = fileNameField.getText();
+                loadBooksFromFile(fileName);
+            }
+        });
 
         // Remove by barcode button action listener
         removeBarcodeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String sql = "DELETE FROM books WHERE barcode = ?";
-                try (Connection conn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
-                     PreparedStatement stmt = conn.prepareStatement(sql)) {
-                    stmt.setString(1, barcodeField.getText());
-                    int rowsAffected = stmt.executeUpdate();
-                    if (rowsAffected > 0) {
-                        displayArea.append("Book with barcode " + barcodeField.getText() + " removed successfully.\n");
-                 	   Statement st;
-                 	   ResultSet rs;
-                 	   st = conn.createStatement();
-                 	   rs = st.executeQuery("select * from books");
-                 	    ResultSetMetaData metadata = rs.getMetaData();
-                 	    int columnCount = metadata.getColumnCount();  
-                 	    String content = "";
-                 	    while (rs.next()) {
-                 	        String row = "";
-                 	        for (int i = 1; i <= columnCount; i++) {
-                 	            row += rs.getString(i) + ", ";          
-                 	        }
-                 	        content += row + "\n";
-                 	    }
-                 	    displayArea.append(content);
-                    } else {
-                    	displayArea.append("No book found with barcode \"" + barcodeField.getText() + "\".");
-                    }
-                } catch (SQLException event) {
-                    System.err.println("Error removing book by barcode: " + event.getMessage());
-                }
+                int barcode = Integer.parseInt(barcodeField.getText());
+                removeBookByBarcode(barcode);
             }
         });
 
@@ -113,34 +85,8 @@ public class LibraryGUI extends JFrame {
         removeTitleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String sql = "DELETE FROM books WHERE title = ?";
-                try (Connection conn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
-                     PreparedStatement stmt = conn.prepareStatement(sql)) {
-                    stmt.setString(1, titleField.getText());
-                    int rowsAffected = stmt.executeUpdate();
-                    if (rowsAffected > 0) {
-                    	displayArea.append("Book with title " + titleField.getText() + " removed successfully.\n");
-                 	   Statement st;
-                 	   ResultSet rs;
-                 	   st = conn.createStatement();
-                 	   rs = st.executeQuery("select * from books");
-                 	    ResultSetMetaData metadata = rs.getMetaData();
-                 	    int columnCount = metadata.getColumnCount();  
-                 	    String content = "";
-                 	    while (rs.next()) {
-                 	        String row = "";
-                 	        for (int i = 1; i <= columnCount; i++) {
-                 	            row += rs.getString(i) + ", ";          
-                 	        }
-                 	        content += row + "\n";
-                 	    }
-                 	    displayArea.append(content);
-                    } else {
-                    	displayArea.append("No book found with title \"" + titleField.getText() + "\".");
-                    }
-                } catch (SQLException event) {
-                    System.err.println("Error removing book by title: " + event.getMessage());
-                }
+                String title = titleField.getText();
+                removeBookByTitle(title);
             }
         });
 
@@ -148,35 +94,8 @@ public class LibraryGUI extends JFrame {
         checkOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-            	LocalDate localDate = LocalDate.now().plusWeeks(4);
-                try (Connection conn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
-                	   PreparedStatement stmt = conn.prepareStatement("UPDATE books SET checked_out = 1, due_date = " + dtf.format(localDate) + " WHERE title = ? AND checked_out = 0")) {
-                       stmt.setString(1, checkOutField.getText());
-                       int rowsUpdated = stmt.executeUpdate();
-                       if (rowsUpdated > 0) {
-                    	   displayArea.append("Book \"" + checkOutField.getText() + "\" checked out successfully.");
-                    	   Statement st;
-                    	   ResultSet rs;
-                    	   st = conn.createStatement();
-                    	   rs = st.executeQuery("select * from books");
-                    	    ResultSetMetaData metadata = rs.getMetaData();
-                    	    int columnCount = metadata.getColumnCount();  
-                    	    String content = "";
-                    	    while (rs.next()) {
-                    	        String row = "";
-                    	        for (int i = 1; i <= columnCount; i++) {
-                    	            row += rs.getString(i) + ", ";          
-                    	        }
-                    	        content += row + "\n";
-                    	    }
-                    	    displayArea.append(content);
-                       } else {
-                    	   displayArea.append("Book \"" + checkOutField.getText() + "\" not found or already checked out.");
-                       }
-                   } catch (SQLException event) {
-                       event.printStackTrace();
-                   }
+                String title = checkOutField.getText();
+                checkOutBook(title);
             }
         });
 
@@ -184,33 +103,8 @@ public class LibraryGUI extends JFrame {
         checkInButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	try (Connection conn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
-            		   PreparedStatement stmt = conn.prepareStatement("UPDATE books SET checked_out = 0, due_date = NULL WHERE title = ? AND checked_out = 1")) {
-                       stmt.setString(1, checkInField.getText());
-                       int rowsUpdated = stmt.executeUpdate();
-                       if (rowsUpdated > 0) {
-                    	   displayArea.append("Book \"" + checkInField.getText() + "\" checked in successfully.");
-                    	   Statement st;
-                    	   ResultSet rs;
-                    	   st = conn.createStatement();
-                    	   rs = st.executeQuery("select * from books");
-                    	    ResultSetMetaData metadata = rs.getMetaData();
-                    	    int columnCount = metadata.getColumnCount();  
-                    	    String content = "";
-                    	    while (rs.next()) {
-                    	        String row = "";
-                    	        for (int i = 1; i <= columnCount; i++) {
-                    	            row += rs.getString(i) + ", ";          
-                    	        }
-                    	        content += row + "\n";
-                    	    }
-                    	    displayArea.append(content);
-                       } else {
-                    	   displayArea.append("Book \"" + checkInField.getText() + "\" not found or already checked in.");
-                       }
-                   } catch (SQLException event) {
-                       event.printStackTrace();
-                   }
+                String title = checkInField.getText();
+                library.checkInBook(title);
             }
         });
 
@@ -227,5 +121,65 @@ public class LibraryGUI extends JFrame {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    /* Method to load books from a file and add them to the library */
+    private void loadBooksFromFile(String fileName) {
+    	Book book;
+    	String currentUsersHomeDir = System.getProperty("user.dir");
+    	fileName = currentUsersHomeDir + "\\" + "src"+ "\\" + fileName;
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                int id = Integer.parseInt(parts[0].trim());
+                String title = parts[1].trim();
+                String author = parts[2].trim();
+                library.addBook(book = new Book(id, title, author));
+                displayArea.append(book.toString() + "\n");
+            }            
+        } catch (IOException e) {
+            displayArea.append("Error: File not found.\n");
+        }
+    }
+
+    /* Method to remove a book from the library by barcode */
+    private void removeBookByBarcode(int barcode) {
+        if (library.removeBookById(barcode)) {
+            displayArea.append("Book with barcode " + barcode + " removed successfully.\n");
+            appendBooks();
+        } else {
+            displayArea.append("Error: Book with barcode " + barcode + " not found.\n");
+        }
+    }
+
+    /* Method to remove a book from the library by title */
+    private void removeBookByTitle(String title) {
+        if (library.removeBookByTitle(title)) {
+            displayArea.append("Book with title \"" + title + "\" removed successfully.\n");
+            appendBooks();
+        } else {
+            displayArea.append("Error: Book with title \"" + title + "\" not found.\n");
+        }
+    }
+
+    /* Method to check out a book from the library */
+    private void checkOutBook(String title) {
+        if (library.checkOutBook(title)) {
+            displayArea.append("Book \"" + title + "\" checked out successfully.\n");
+            appendBooks();
+        }
+       }
+    
+    /* Method to display library´s books into the display area */
+    private void appendBooks() {
+        if (library.books.isEmpty()) {
+            System.out.println("The library is empty.");
+        } else {
+            for (Book book : library.books.values()) {
+                displayArea.append(book.toString());
+            }
+        }
+        displayArea.append("\n");
     }
     }
