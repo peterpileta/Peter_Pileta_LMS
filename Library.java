@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 /**
- * Peter Pileta, Software Development I, 04/07/2024
  * Class Name: Library
  * This class manages a collection of books, including operations to add, remove,
  * check out, and check in books. It acts as the database for the library system.
@@ -17,12 +16,12 @@ public class Library {
         this.books = new HashMap<>();
     }
 
-    // Add a book to the library
+    /** Add a book to the library */
     public void addBook(Book book) {
         books.put(book.getId(), book);
     }
-    
-    // Read books from a text file
+
+    /** Read books from a text file */
     public void readFile() {
     	String file;
     	Scanner scanner = new Scanner(System.in);
@@ -48,7 +47,7 @@ public class Library {
        
     }
 
-    // Remove a book from the library by ID
+    /** Remove a book from the library by ID */
     public boolean removeBookById(int id) {
         if (books.containsKey(id)) {
             books.remove(id);
@@ -57,7 +56,7 @@ public class Library {
         return false;
     }
 
-    // Remove a book from the library by title
+    /** Remove a book from the library by title */
     public boolean removeBookByTitle(String title) {
         for (Book book : books.values()) {
             if (book.getTitle().equalsIgnoreCase(title)) {
@@ -68,7 +67,7 @@ public class Library {
         return false;
     }
 
-    // Check out a book
+    /* Check out a book */
     public boolean checkOutBook(String title) {
         for (Book book : books.values()) {
             if (book.getTitle().equalsIgnoreCase(title) && !book.isCheckedOut()) {
@@ -79,7 +78,7 @@ public class Library {
         return false;
     }
 
-    // Check in a book
+    /* Check in a book */
     public boolean checkInBook(String title) {
         for (Book book : books.values()) {
             if (book.getTitle().equalsIgnoreCase(title) && book.isCheckedOut()) {
@@ -90,7 +89,7 @@ public class Library {
         return false;
     }
 
-    // Print all books in the library
+    /* Print all books in the library */
     public void printBooks() {
         if (books.isEmpty()) {
             System.out.println("The library is empty.");
